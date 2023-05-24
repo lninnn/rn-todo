@@ -6,6 +6,7 @@ import {
   View,
   Button
 } from 'react-native';
+import {CheckTodo, DelTodo} from './../actions/ToDoAction'
 
 class Item extends Component{
   constructor(props){
@@ -14,10 +15,16 @@ class Item extends Component{
     this.handleDel = this.handleDel.bind(this)
   }
   handleChecked(){
-    this.props.handleChange(this.props.item.id,!this.props.item.value)
-  }
-  handleDel(){
-    this.props.handleDelete(this.props.item.id)
+      const buffer = {
+        id : this.props.item.id,
+        value: !this.props.item.value,
+        text: this.props.item.text
+      }
+      this.props.dispatch(CheckTodo(buffer))
+    }
+ 
+  handleDel = () =>{
+    this.props.dispatch(DelTodo(this.props.item.id))
   }
   render(){
   return(

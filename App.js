@@ -1,11 +1,5 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+import React, {useState, useEffect} from 'react';
 
-import React,{useState, useEffect} from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -14,11 +8,21 @@ import {
   View,
   Button
 } from 'react-native';
+
 import Item from './components/Item'
-function App() {
+
+import store from './store';
+import {Getter, AddTodo, CheckTodo, DelTodo} from './actions/ToDoAction'
+import { useSelector, useDispatch, Provider } from 'react-redux';
+
+function AppComp() {
   const [todo, setTodo] = useState('')
-  const [todos, setTodos] = useState([])
+  // const [todos, setTodos] = useState()
   const [done,setDone] = useState(0)
+  const dispatch = useDispatch()
+  const item = Getter()
+  let todos = item.state.todo.todos
+  console.log(todos)
   const handleAddTodo = () =>{
     if (todo.length> 0 ){
       const buffer = {
@@ -26,56 +30,42 @@ function App() {
         value:false,
         text: todo
       }
-      setTodos([...todos, buffer])
+      dispatch(AddTodo(buffer))
     }
   }
-  const handleChange = (id, value) => {
-    let buffer = todos.length
-    let updated =  todos.map((item)=>{
-      if(item.id == id){
-        item.value = value
-      }
-      if(!item.value){
-        buffer = buffer -1
-      }
-      return item
-    })
-    setDone(buffer) 
-    setTodos(updated)  
-  }
-
-  const handleDelete = (id) =>{
-    let updated = todos.filter((item)=>item.id !==id)
-    setTodos(updated)
-  }
-
   return (
-    <SafeAreaView style = {styles.container}>
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic">     
-        <View> 
-          <TextInput
-          style = {styles.input}
-          placeholder='add Todo'
-          onChangeText={(text)=>setTodo(text)}
-          />
-          <Button
-          title='ADD'
-          onPress={handleAddTodo}
-          />
-        </View>  
-        {todos.map((item)=><Item 
-        key={item.id}
-          item = {item}
-          handleChange={handleChange}
-          handleDelete = {handleDelete}
-          />)}
-      </ScrollView>
-      <Text style = {styles.complete}>{done}/{todos.length}</Text>
-    </SafeAreaView>
+      <SafeAreaView style = {styles.container}>
+        <ScrollView
+          contentInsetAdjustmentBehavior="automatic">     
+          <View> 
+            <TextInput
+            style = {styles.input}
+            placeholder='add Todo'
+            onChangeText={(text)=>setTodo(text)}
+            />
+            <Button
+            title='ADD'
+            onPress={handleAddTodo}
+            />
+          </View>  
+          {todos.map((item)=><Item 
+            key={item.id}
+            item = {item}
+            dispatch = {dispatch}
+            // handleChange={handleChange}
+            />)}
+        </ScrollView>
+        <Text style = {styles.complete}>{done}/{todos.length}</Text>
+      </SafeAreaView>
   );
 }
-
+function App(){
+  return(
+    <Provider store = {store}>
+      <AppComp/>
+    </Provider>
+  )
+}
 const styles = StyleSheet.create({
   container:{
     height:'100%'
